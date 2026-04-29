@@ -1,25 +1,30 @@
-import logo from './logo.svg';
-import './App.css';
-
-function App() {
+import { useEffect, useState } from "react";
+import axios from "axios";
+import Navbar from "./components/Navbar";
+import CustomerForm from "./components/CustomerForm";
+import CustomerTable from "./components/CustomerTable";
+import "./App.css";
+const API = process.env.REACT_APP_API_URL;
+export default function App() {
+  const [customers, setCustomers] = useState([]);
+  const fetchCustomers = async () => {
+    const res = await axios.get(`${API}/customers`);
+    setCustomers(res.data);
+  };
+  useEffect(() => {
+    fetchCustomers();
+  }, []);
+  const handleDelete = async (id) => {
+    await axios.delete(`${API}/customers/${id}`);
+    fetchCustomers();
+  };
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <Navbar />
+      <div className="container">
+        <CustomerForm onCustomerAdded={fetchCustomers} />
+        <CustomerTable customers={customers} onDelete={handleDelete} />
+      </div>
     </div>
   );
 }
-
-export default App;
